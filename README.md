@@ -8,7 +8,9 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
+| v1.2.5 | [`v1.2.5`](https://github.com/chainguard-actions/opt-nc-setup-duckdb-action/tree/v1.2.5) | [`2ccdd1a`](https://github.com/opt-nc/setup-duckdb-action/commit/2ccdd1a22be62960be88478d4d3a81b2ebd158dc) |
 | v1.2.6 | [`v1.2.6`](https://github.com/chainguard-actions/opt-nc-setup-duckdb-action/tree/v1.2.6) | [`864b7bd`](https://github.com/opt-nc/setup-duckdb-action/commit/864b7bd3b3fe3adc8fc203e3dbfac7e17152946c) |
+| v1.2.9 | [`v1.2.9`](https://github.com/chainguard-actions/opt-nc-setup-duckdb-action/tree/v1.2.9) | [`c64cd61`](https://github.com/opt-nc/setup-duckdb-action/commit/c64cd61a8a0af98f7d5d8b45e9dc332d250cd217) |
 
 ## Privacy
 

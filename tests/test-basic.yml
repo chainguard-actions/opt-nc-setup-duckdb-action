@@ -1,0 +1,41 @@
+name: Test basic usage (latest version)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: setup
+        uses: .
+        with:
+          version: latest
+      - name: Assert duckdb is on PATH
+        run: |
+          echo "Checking duckdb is available..."
+          if ! command -v duckdb >/dev/null 2>&1; then
+            echo "FAIL: duckdb not found on PATH"
+            exit 1
+          fi
+          echo "PASS: duckdb found at $(command -v duckdb)"
+      - name: Assert duckdb runs
+        run: |
+          echo "Running duckdb version check..."
+          VERSION_OUTPUT=$(duckdb --version 2>&1)
+          echo "actual: $VERSION_OUTPUT"
+          if [ -z "$VERSION_OUTPUT" ]; then
+            echo "FAIL: duckdb --version returned empty output"
+            exit 1
+          fi
+          echo "PASS: duckdb is functional"
+      - name: Assert duckdb can execute a query
+        run: |
+          echo "Running a simple SQL query..."
+          RESULT=$(duckdb -c "SELECT 42 AS answer;" 2>&1)
+          echo "actual: $RESULT"
+          if echo "$RESULT" | grep -q "42"; then
+            echo "PASS: duckdb executed query successfully"
+          else
+            echo "FAIL: expected '42' in output but got: $RESULT"
+            exit 1
+          fi

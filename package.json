@@ -1,0 +1,22 @@
+{
+  "name": "setup-duckdb-action",
+  "description": "GitHub action that installs DuckDB with the version provided in input.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint .",
+    "prepare": "npm run build && ncc build build/index.js -o dist --source-map --license licenses.txt",
+    "test": "echo \"Warning: no test implemented\"",
+    "all": "npm run lint && npm run prepare"
+  },
+  "dependencies": {
+    "@actions/core": "^3.0.1",
+    "axios": "^1.19.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "@vercel/ncc": "^0.44.1",
+    "eslint": "^10.8.1",
+    "typescript": "^7.0.2"
+  }
+}

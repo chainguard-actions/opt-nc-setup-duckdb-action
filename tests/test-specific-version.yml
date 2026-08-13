@@ -1,0 +1,38 @@
+name: Test specific version installation
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: v1.1.0
+      - name: Assert duckdb is installed at the requested version
+        run: |
+          echo "Checking duckdb is on PATH..."
+          if ! command -v duckdb >/dev/null 2>&1; then
+            echo "FAIL: duckdb not found on PATH"
+            exit 1
+          fi
+          echo "duckdb found at: $(command -v duckdb)"
+          VERSION_OUTPUT="$(duckdb --version 2>&1)"
+          echo "duckdb version output: $VERSION_OUTPUT"
+          if echo "$VERSION_OUTPUT" | grep -q "1.1.0"; then
+            echo "PASS: duckdb v1.1.0 is installed"
+          else
+            echo "FAIL: expected version '1.1.0' in output, got: $VERSION_OUTPUT"
+            exit 1
+          fi
+      - name: Assert duckdb can execute a query at specific version
+        run: |
+          RESULT="$(duckdb -c "SELECT 'version_test' AS test;" 2>&1)"
+          echo "Query result: $RESULT"
+          if echo "$RESULT" | grep -q "version_test"; then
+            echo "PASS: duckdb executed query successfully"
+          else
+            echo "FAIL: expected 'version_test' in query output"
+            exit 1
+          fi

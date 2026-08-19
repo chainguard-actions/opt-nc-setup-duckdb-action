@@ -6,26 +6,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - id: setup-duckdb
+      - id: setup
         uses: .
         with:
-          version: 'v1.1.3'
-      - name: Assert duckdb is installed and executable
+          version: v1.1.3
+      - name: Assert duckdb is installed and on PATH
         run: |
-          echo "Checking duckdb is in PATH..."
-          if ! command -v duckdb &>/dev/null; then
-            echo "FAIL: duckdb command not found in PATH"
+          echo "Checking duckdb is available..."
+          if ! command -v duckdb >/dev/null 2>&1; then
+            echo "FAIL: duckdb not found on PATH"
             exit 1
           fi
           echo "PASS: duckdb found at $(command -v duckdb)"
-      - name: Assert duckdb version matches requested version
+      - name: Assert duckdb reports the expected version
         run: |
-          echo "Running duckdb --version..."
           VERSION_OUTPUT=$(duckdb --version 2>&1)
-          echo "Output: $VERSION_OUTPUT"
+          echo "duckdb version output: $VERSION_OUTPUT"
           if echo "$VERSION_OUTPUT" | grep -q "v1.1.3"; then
             echo "PASS: duckdb version matches v1.1.3"
           else
-            echo "FAIL: expected version v1.1.3 but got: $VERSION_OUTPUT"
+            echo "FAIL: expected version v1.1.3 in output, got: $VERSION_OUTPUT"
+            exit 1
+          fi
+      - name: Assert duckdb can execute a simple query
+        run: |
+          RESULT=$(duckdb -c "SELECT 'hello' AS greeting;" 2>&1)
+          echo "Query result: $RESULT"
+          if echo "$RESULT" | grep -q "hello"; then
+            echo "PASS: duckdb executed query successfully"
+          else
+            echo "FAIL: expected 'hello' in query output, got: $RESULT"
             exit 1
           fi

@@ -1,0 +1,55 @@
+name: 🚀 Release
+
+on:
+  push:
+    branches: [main, develop]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: 🧪 Build
+        run: npm ci && npm run prepare
+
+      - name: ↔️ Compare the expected and actual dist/ directories
+        run: |
+          if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
+            echo "❌ Detected uncommitted changes after build.  See status below:"
+            git diff
+            exit 1
+          fi
+
+      - name: 📦 Semantic Release
+        if: github.ref == 'refs/heads/main'
+        id: release
+        uses: cycjimmy/semantic-release-action@b12c8f6015dc215fe37bc154d4ad456dd3833c90 # v6
+        with:
+          extra_plugins: |
+            @semantic-release/exec
+            @semantic-release/git
+            conventional-changelog-conventionalcommits
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 👍 Merge main back to dev
+        if: github.ref == 'refs/heads/main' && steps.release.outputs.new_release_published == 'true'
+        run: |
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git fetch
+            git checkout develop
+            git branch --set-upstream-to=origin/develop develop
+            git pull
+            git merge --no-ff main -m "Auto-merge main back to dev"
+            git push

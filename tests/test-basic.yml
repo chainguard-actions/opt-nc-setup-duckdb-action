@@ -6,18 +6,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - id: action
+      - id: setup
         uses: .
         with:
           version: latest
       - name: Assert duckdb is installed and executable
         run: |
-          echo "Checking duckdb is in PATH..."
-          if ! command -v duckdb &>/dev/null; then
-            echo "FAIL: duckdb command not found in PATH"
+          echo "Checking duckdb is on PATH..."
+          if ! command -v duckdb >/dev/null 2>&1; then
+            echo "FAIL: duckdb not found on PATH"
             exit 1
           fi
-          echo "PASS: duckdb found at $(command -v duckdb)"
+          echo "duckdb found at: $(command -v duckdb)"
+          echo "PASS"
       - name: Assert duckdb runs and returns version
         run: |
           echo "Running duckdb --version..."
@@ -28,3 +29,14 @@ jobs:
             exit 1
           fi
           echo "PASS: duckdb version output: $VERSION_OUTPUT"
+      - name: Assert duckdb can execute a simple query
+        run: |
+          echo "Running a simple SQL query..."
+          RESULT=$(duckdb -c "SELECT 42 AS answer;" 2>&1)
+          echo "Result: $RESULT"
+          if echo "$RESULT" | grep -q "42"; then
+            echo "PASS: duckdb executed query successfully"
+          else
+            echo "FAIL: expected '42' in output, got: $RESULT"
+            exit 1
+          fi

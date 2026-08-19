@@ -1,0 +1,50 @@
+name: Dependabot post-update
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+    branches: [develop]
+    
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  post-update:
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Checkout out pull request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr checkout "$PR_NUMBER"
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - run: npm install --frozen-lockfile
+
+      - run: npm ci && npm run prepare
+
+      - name: Commit and push if needed
+        run: |
+          git add .
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "💾 no changes to dist/index.js"
+            exit 0
+          fi
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -m "Apply dist/index.js changes"
+          git push
+          echo "💾 pushed dist/index.js changes"

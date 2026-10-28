@@ -17,6 +17,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | v1.2.8 | [`v1.2.8`](https://github.com/chainguard-actions/opt-nc-setup-duckdb-action/tree/v1.2.8) | [`1299af7`](https://github.com/opt-nc/setup-duckdb-action/commit/1299af7c86cf0995d1f88564e58c6c95a1565198) | [`HARDENING.md`](https://github.com/chainguard-actions/opt-nc-setup-duckdb-action/blob/v1.2.8/HARDENING.md) |
 | v1.2.9 | [`v1.2.9`](https://github.com/chainguard-actions/opt-nc-setup-duckdb-action/tree/v1.2.9) | [`c64cd61`](https://github.com/opt-nc/setup-duckdb-action/commit/c64cd61a8a0af98f7d5d8b45e9dc332d250cd217) | [`HARDENING.md`](https://github.com/chainguard-actions/opt-nc-setup-duckdb-action/blob/v1.2.9/HARDENING.md) |
 | v1.3.0 | [`v1.3.0`](https://github.com/chainguard-actions/opt-nc-setup-duckdb-action/tree/v1.3.0) | [`7453ff9`](https://github.com/opt-nc/setup-duckdb-action/commit/7453ff946f4756125164b7bce614e5620cbaf9ba) | [`HARDENING.md`](https://github.com/chainguard-actions/opt-nc-setup-duckdb-action/blob/v1.3.0/HARDENING.md) |
+| v1.4.0 | [`v1.4.0`](https://github.com/chainguard-actions/opt-nc-setup-duckdb-action/tree/v1.4.0) | [`54e3e3f`](https://github.com/opt-nc/setup-duckdb-action/commit/54e3e3f0e82dc39f1a164a0e9485768c4016e299) | [`HARDENING.md`](https://github.com/chainguard-actions/opt-nc-setup-duckdb-action/blob/v1.4.0/HARDENING.md) |
 
 ## Privacy
 

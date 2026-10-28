@@ -1,0 +1,18 @@
+name: 'DuckDB setup'
+description: 'Install and setup DuckDB'
+branding:
+  icon: archive
+  color: green
+inputs:
+  version:  # version of duckDB
+    description: 'The version to install'
+    required: false
+    default: 'latest'
+  github-token:
+    description: 'GitHub token used to authenticate API calls (avoids rate limiting)'
+    required: false
+    default: ${{ github.token }}
+runs:
+  pre: chainguard-phonehome.js
+  using: 'node24'
+  main: 'dist/index.js'

@@ -1,0 +1,41 @@
+name: Test latest version install
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Ensure prerequisites (unzip, sudo)
+        run: |
+          SUDO=""
+          if [ "$(id -u)" != "0" ] && command -v sudo >/dev/null 2>&1; then SUDO="sudo"; fi
+          if ! command -v unzip >/dev/null 2>&1; then
+            $SUDO apt-get update && $SUDO apt-get install -y unzip
+          fi
+          if ! command -v sudo >/dev/null 2>&1; then
+            printf '#!/bin/sh\nexec "$@"\n' > /usr/local/bin/sudo
+            chmod +x /usr/local/bin/sudo
+          fi
+      - id: action
+        uses: .
+      - name: Assert duckdb installed
+        run: |
+          set -e
+          if ! command -v duckdb >/dev/null 2>&1; then
+            echo "FAIL: duckdb not on PATH"
+            exit 1
+          fi
+          VERSION_OUT="$(duckdb --version)"
+          echo "duckdb --version: $VERSION_OUT"
+          if ! echo "$VERSION_OUT" | grep -qE 'v[0-9]+\.[0-9]+\.[0-9]+'; then
+            echo "FAIL: unexpected version output"
+            exit 1
+          fi
+          RESULT="$(duckdb -c 'SELECT 40 + 2 AS answer;' -csv -noheader 2>/dev/null || duckdb -csv -noheader -c 'SELECT 40 + 2;')"
+          echo "query result: $RESULT"
+          if ! echo "$RESULT" | grep -q '42'; then
+            echo "FAIL: query did not return 42"
+            exit 1
+          fi
+          echo "PASS"

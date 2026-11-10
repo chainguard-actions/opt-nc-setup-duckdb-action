@@ -1,0 +1,36 @@
+name: Test specific version install
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Ensure prerequisites (unzip, sudo)
+        run: |
+          SUDO=""
+          if [ "$(id -u)" != "0" ] && command -v sudo >/dev/null 2>&1; then SUDO="sudo"; fi
+          if ! command -v unzip >/dev/null 2>&1; then
+            $SUDO apt-get update && $SUDO apt-get install -y unzip
+          fi
+          if ! command -v sudo >/dev/null 2>&1; then
+            printf '#!/bin/sh\nexec "$@"\n' > /usr/local/bin/sudo
+            chmod +x /usr/local/bin/sudo
+          fi
+      - id: action
+        uses: .
+        with:
+          version: v1.1.3
+      - name: Assert duckdb v1.1.3 installed
+        run: |
+          if ! command -v duckdb >/dev/null 2>&1; then
+            echo "FAIL: duckdb not on PATH"
+            exit 1
+          fi
+          VERSION_OUT="$(duckdb --version)"
+          echo "duckdb --version: $VERSION_OUT"
+          if ! echo "$VERSION_OUT" | grep -q 'v1.1.3'; then
+            echo "FAIL: expected v1.1.3"
+            exit 1
+          fi
+          echo "PASS"
